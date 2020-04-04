@@ -1,7 +1,8 @@
-﻿;#NoTrayIcon
+;#NoTrayIcon
 #Include %A_ScriptDir%\TrayIcon.ahk
 #SingleInstance force
-DetectHiddenWindows On
+;DetectHiddenWindows On
+
 
 if not A_IsAdmin
 {
@@ -14,84 +15,92 @@ AllTray()
 {
 	AllList := []
 	for index, element in TrayIcon_GetInfo()
-		AllList.Push([element.idcmd, element.tray, element.class, false, element.process])
+		AllList.Push([element.hicon, element.process, element.tooltip, element.tray, element.idcmd, element.class, False])
 	return AllList
-}
-
-HideTray(Exes)
-{
-	HideList := []
-	for index, hideexe in Exes
-		for index, exe in TrayIcon_GetInfo(hideexe)
-			HideList.Push([exe.idcmd, exe.tray, exe.class, true, exe.process])
-	return HideList
 }
 
 AllList := AllTray()
 
-HideExes := []
+HideList := []
 Loop
 {
-    FileReadLine, line, %A_ScriptDir%\Tray.txt, %A_Index%
+    FileReadLine, line, %A_ScriptDir%\Tray.txt, A_Index
     if ErrorLevel
         break
-    HideExes.Push(line)
+    HideList.Push(line)
 }
 
-HideList := HideTray(HideExes)
 
 for index, element in AllList
 	for num, exe in HideList
-		if element[1] == exe[1]{
-			element[2] := exe[2]
-			element[3] := exe[3]
-			element[4] := exe[4]
-			element[5] := exe[5]
+		if element[2] == exe
+        {
+			element[7] := True
 			break
 		}
 	
 
-
 for index, pa in AllList
-	TrayIcon_Hide(pa[1], pa[2], pa[4])
+	TrayIcon_Hide(pa[5], pa[4], pa[7])
 
 
 F2::
-Gui, TrayIcon:New, AlwaysOnTop, Saryta -  Tray Icon Hide
+Gui, Add, Listview, Grid R30 W694 AltSubmit Checked BackgroundF4F8F4, Hide|Process|ToolTip|Tray|Id
+
+ImageListID := IL_Create(10)	;创建新的初始为空的图像列表，并返回图像列表的唯一ID
+LV_SetImageList(ImageListID)	;会直接关联到listview
+
 for index, pa in AllList
 {
-	ClassName := pa[3]
-	HideSelect := pa[4]
-	ExeHide := pa[5]
-	Gui, Add, Checkbox, Checked%HideSelect% vChange%index% gChange, %ExeHide%：
-	Gui, Add, Text, , ClassName： %ClassName%
+	hicon := pa[1]
+    Process := pa[2]
+    Tooltip := pa[3]
+	Tray := (pa[4] == "Shell_TrayWnd") ? "通知区域" : "溢出区域"
+	Idcmd := pa[5]
+	ExeHide := pa[7]
+	IconNumber := DllCall("ImageList_ReplaceIcon", "ptr", ImageListID, "int", -1, "ptr", hIcon) + 1
 	
+	LV_Add((ExeHide ? "Check Icon" : "Icon") . IconNumber,, Process, Tooltip, Tray, Idcmd)
 }
 
-Gui, Add, Button, w80 gFileWrite, OK
+LV_ModifyCol()	;如果省略所有参数, 则调整所有列的宽度以适应行的内容
+LV_ModifyCol(3, "AutoHdr")
 
-Gui, show, AutoSize 
+Gui, Add, Button, w80 gFileWrite X610, OK
+
+Gui, show, AutoSize, Saryta -  Tray Icon Hide
 
 Return
 
 
-Change:
-	Gui, Submit, NoHide
+GuiEscape:
+GuiClose:
+FileWrite:
+	Rows := []
+	RowNumber := 0
+	Loop {
+		RowNumber := LV_GetNext(RowNumber, "Checked")  ; 在前一次找到的位置后继续搜索.
+		If !RowNumber
+			break
+		Rows.Push(RowNumber)
+	}
+	File := FileOpen("Tray.txt", "w")
+	
 	for index, pa in AllList
 	{
-		If pa[4] != Change%index%{
-			pa[4] := Change%index%
-			TrayIcon_Hide(pa[1], pa[2], pa[4])
-		}
+		flag := False
+		for number, row in Rows
+			If (index == row){
+				flag := True
+				Break
+			}
+		pa[7] := flag
+		TrayIcon_Hide(pa[5], pa[4], pa[7])
+		If pa[7]
+			File.Write(pa[2]"`n")
 	}
+	File.Close()
+	Gui, Destroy
+	Reload
 Return
 
-FileWrite:
-File := FileOpen("Tray.txt", "w")
-for index, pa in AllList
-	If pa[4]
-		File.Write(pa[5]"`n")
-File.Close()
-Gui, Destroy
-Reload
-Return
