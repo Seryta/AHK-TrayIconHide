@@ -1,7 +1,6 @@
 #NoTrayIcon
 #Include %A_ScriptDir%\TrayIcon.ahk
 #SingleInstance force
-;DetectHiddenWindows On
 
 
 if not A_IsAdmin
@@ -74,14 +73,10 @@ Gui, Add, Button, w80 gFileWrite X560, OK
 
 Gui, show, AutoSize, Saryta -  Tray Icon Hide
 
-;WinSet, Transparent, 200, Saryta -  Tray Icon Hide
-
 Return
 
 
 MyListView:
-
-;ToolTip % "A_GuiEvent: " . "`t" . A_GuiEvent
 
 if (A_GuiEvent == "DoubleClick") {
     LV_GetText(msgid, A_EventInfo, 5)	

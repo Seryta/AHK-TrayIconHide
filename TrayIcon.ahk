@@ -60,7 +60,7 @@ TrayIcon_GetInfo(sExeName := "")
         SendMessage, 0x0418, 0, 0, ToolbarWindow32%idxTB%, ahk_class %sTray%
         Loop, %ErrorLevel%
         {
-             ; TB_GETBUTTON 0x0417
+            ; TB_GETBUTTON 0x0417
             SendMessage, 0x0417, A_Index-1, pRB, ToolbarWindow32%idxTB%, ahk_class %sTray%
 
             DllCall("ReadProcessMemory", Ptr,hProc, Ptr,pRB, Ptr,&btn, UPtr,szBtn, UPtr,0)
