@@ -33,7 +33,7 @@ Loop
 for index, element in AllList
 	for num, exe in HideList
 		if element[2] == exe
-        {
+        	{
 			element[7] := True
 			break
 		}
