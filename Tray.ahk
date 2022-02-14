@@ -5,7 +5,7 @@
 
 if not A_IsAdmin
 {
-   Run *RunAs "%A_ScriptFullPath%" 
+   Run *RunAs "%A_ScriptFullPath%"
    ExitApp
 }
 
@@ -26,7 +26,15 @@ Loop
     FileReadLine, line, %A_ScriptDir%\Tray.txt, A_Index
     if ErrorLevel
         break
-    HideList.Push(line)
+    HideList.Insert(line)
+}
+; 总是自动隐藏，写在alwaysHideTrayIcon.txt文件中
+Loop
+{
+	FileReadLine, line, %A_ScriptDir%\alwaysHideTrayIcon.txt, A_Index
+    if ErrorLevel
+        break
+    HideList.Insert(line)
 }
 
 
@@ -37,7 +45,7 @@ for index, element in AllList
 			element[7] := True
 			break
 		}
-	
+
 
 for index, pa in AllList
 	TrayIcon_Hide(pa[5], pa[4], pa[7])
@@ -79,7 +87,7 @@ Return
 MyListView:
 
 if (A_GuiEvent == "DoubleClick") {
-    LV_GetText(msgid, A_EventInfo, 5)	
+    LV_GetText(msgid, A_EventInfo, 5)
     LV_GetText(uid, A_EventInfo, 6)
     LV_GetText(hwnd, A_EventInfo, 7)
     TrayIcon_Button(msgid, uid, hwnd, sButton:="L", bDouble:=false, nIdx:=1)	;false为单击，需要具体安排
@@ -119,7 +127,7 @@ FileWrite:
 		Rows.Push(RowNumber)
 	}
 	File := FileOpen("Tray.txt", "w")
-	
+
 	for index, pa in AllList
 	{
 		flag := False
@@ -137,4 +145,3 @@ FileWrite:
 	Gui, Destroy
 	Reload
 Return
-
