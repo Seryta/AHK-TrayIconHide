@@ -6,6 +6,7 @@
     * 安装AutoHotKey后，下载GitHub文件（任意位置存放），右击Tray.ahk选择以管理员运行
     * F2快捷键可呼出选择界面，勾选想要隐藏图标的程序，点击OK即可
     * 在Tray.ahk文件中，可更改快捷键F2，推荐学习AutoHotKey语法，自行更改
+    * 在Tray.ahk文件同级目录，建立alwaysHideTrayIcon.txt，其中的程序永久自动隐藏
     * 需要将Tray.ahk设置为[开机自启](https://jingyan.baidu.com/article/414eccf65768866b431f0a1d.html)
 3. 隐藏后任务栏出现空白（仅限显示在任务栏上的图标）：
     * 因为我使用的是hide，所以导致仅仅隐藏了图标留下空白，也与任务栏机制有关。下一个版本我尝试一下增加设置选项，可以delete一些不需要显示的图标，可能解决
